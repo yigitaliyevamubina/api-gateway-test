@@ -1,4 +1,4 @@
-name: CI
+name: Mock-testing
 
 on:
   push:

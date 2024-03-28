@@ -2,17 +2,21 @@ package tests
 
 import (
 	"encoding/json"
-	"exam/api-gateway/mock/handlers"
 	"exam/api-gateway/api-testing/storage"
+	pbp "exam/api-gateway/genproto/product-service"
 	pb "exam/api-gateway/genproto/user-service"
-	"exam/api-gateway/mock"
 	"fmt"
+
+	"exam/api-gateway/mock/handlers"
+
+	"exam/api-gateway/mock"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cast"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -21,7 +25,7 @@ func TestAPI(t *testing.T) {
 	buffer, err := mock.OpenFile("user.json")
 	require.NoError(t, err)
 
-	h := handlers.NewHandler(&mock.UserServiceClient{})
+	h := handlers.NewHandler(&mock.UserServiceClient{}, &mock.ProductServiceClient{})
 
 	// User Create
 	req := mock.NewRequest(http.MethodPost, "/users/create", buffer)
@@ -33,7 +37,7 @@ func TestAPI(t *testing.T) {
 
 	var user pb.User
 	require.NoError(t, json.Unmarshal(res.Body.Bytes(), &user))
-	fmt.Println(user, "-----------")
+	// fmt.Println(user, "-----------")
 	require.Equal(t, user.Email, "testemail@gmail.com")
 	require.Equal(t, user.Age, int64(18))
 	require.Equal(t, user.FirstName, "Test FirstName")
@@ -98,14 +102,14 @@ func TestAPI(t *testing.T) {
 	r.POST("/users/checkfield", h.CheckField)
 	r.ServeHTTP(checkFieldRes, checkFieldReq)
 	assert.NoError(t, err)
-	fmt.Println(err, "<--------------")
+	// fmt.Println(err, "<--------------")
 	assert.Equal(t, http.StatusOK, checkFieldRes.Code)
 	var message storage.Message
 	bodyBytes, err = io.ReadAll(checkFieldRes.Body)
 	require.NoError(t, err)
 	require.NoError(t, json.Unmarshal(bodyBytes, &message))
 	require.Equal(t, "user exists", message.Message)
-	fmt.Println(message, "==============")
+	// fmt.Println(message, "==============")
 
 	//Check
 	checkReq := mock.NewRequest(http.MethodDelete, "/users/check", buffer)
@@ -137,12 +141,78 @@ func TestAPI(t *testing.T) {
 	r.POST("/users/update/refreshtoken", h.UpdateRefreshToken)
 	r.ServeHTTP(updateRefreshRes, updateRefreshReq)
 	assert.NoError(t, err)
-	fmt.Println(err, "-----------")
+	// fmt.Println(err, "-----------")
 	assert.Equal(t, http.StatusOK, updateRefreshRes.Code)
 	var updateMess storage.Message
 	bodyBytes, err = io.ReadAll(updateRefreshRes.Body)
 	require.NoError(t, err)
-	fmt.Println(err)
+	// fmt.Println(err)
 	require.NoError(t, json.Unmarshal(bodyBytes, &updateMess))
 	require.Equal(t, "updated", updateMess.Message)
+
+	//Product --------------
+	buffer, err = mock.OpenFile("product.json")
+	require.NoError(t, err)
+
+	// Product Create
+	reqProduct := mock.NewRequest(http.MethodPost, "/products/create", buffer)
+	resProduct := httptest.NewRecorder()
+	r = gin.Default()
+	r.POST("/products/create", h.CreateProduct)
+	r.ServeHTTP(resProduct, reqProduct)
+	assert.Equal(t, http.StatusOK, resProduct.Code)
+
+	var product pbp.Product
+	require.NoError(t, json.Unmarshal(resProduct.Body.Bytes(), &product))
+	require.Equal(t, product.Id, int32(1))
+	require.Equal(t, product.Name, "Test Product name")
+	require.Equal(t, product.Description, "Product description")
+	require.Equal(t, product.Price, float32(10))
+	require.Equal(t, product.Amount, int32(13))
+
+	// Product Get
+	getReq = mock.NewRequest(http.MethodGet, "/products/get", buffer)
+	q = getReq.URL.Query()
+	q.Add("id", cast.ToString(product.Id))
+	getReq.URL.RawQuery = q.Encode()
+	getRes = httptest.NewRecorder()
+	r = gin.Default()
+	r.GET("/products/get", h.GetProduct)
+	r.ServeHTTP(getRes, getReq)
+	fmt.Println(getRes.Body)
+	require.Equal(t, http.StatusOK, getRes.Code)
+	var getProductResp pbp.Product
+	require.NoError(t, json.Unmarshal(getRes.Body.Bytes(), &getProductResp))
+	fmt.Println(getProductResp)
+	require.Equal(t, product.Id, getProductResp.Id)
+	require.Equal(t, product.Name, getProductResp.Name)
+	require.Equal(t, product.Description, getProductResp.Description)
+	require.Equal(t, product.Price, getProductResp.Price)
+	require.Equal(t, product.Amount, getProductResp.Amount)
+
+	// Product List
+	listReq = mock.NewRequest(http.MethodGet, "/products", buffer)
+	listRes = httptest.NewRecorder()
+
+	r.GET("/products", h.ListProducts)
+	r.ServeHTTP(listRes, listReq)
+	assert.Equal(t, http.StatusOK, listRes.Code)
+	bodyBytes, err = io.ReadAll(listRes.Body)
+	assert.NoError(t, err)
+	assert.NotNil(t, bodyBytes)
+
+	// Product Delete
+	delReq = mock.NewRequest(http.MethodDelete, "/products/delete", buffer)
+	q = delReq.URL.Query()
+	q.Add("id", cast.ToString(product.Id))
+	delReq.URL.RawQuery = q.Encode()
+	delRes = httptest.NewRecorder()
+	r.DELETE("/products/delete", h.DeleteProduct)
+	r.ServeHTTP(delRes, delReq)
+	assert.Equal(t, http.StatusOK, delRes.Code)
+	var respMessage storage.Message
+	bodyBytes, err = io.ReadAll(delRes.Body)
+	require.NoError(t, err)
+	require.NoError(t, json.Unmarshal(bodyBytes, &respMessage))
+	require.Equal(t, "product was deleted successfully", respMessage.Message)
 }
