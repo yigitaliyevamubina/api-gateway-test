@@ -72,7 +72,7 @@ func (h *handlerV1) Register(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeOut))
 	defer cancel()
 
-	exists, err := h.serviceManager.UserMockService().CheckField(ctx, &pb.CheckFieldRequest{
+	exists, err := h.serviceManager.UserService().CheckField(ctx, &pb.CheckFieldRequest{
 		Field: "email",
 		Data:  body.Email,
 	})
@@ -227,7 +227,7 @@ func (h *handlerV1) Verify(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeOut))
 	defer cancel()
 
-	_, err = h.serviceManager.UserMockService().CreateUser(ctx, &pb.User{
+	_, err = h.serviceManager.UserService().CreateUser(ctx, &pb.User{
 		Id:           respUser.Id,
 		FirstName:    respUser.FirstName,
 		LastName:     respUser.LastName,
@@ -289,7 +289,7 @@ func (h *handlerV1) Login(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeOut))
 	defer cancel()
 
-	resp, err := h.serviceManager.UserMockService().Check(ctx, &pb.IfExists{
+	resp, err := h.serviceManager.UserService().Check(ctx, &pb.IfExists{
 		Email: body.Email,
 	})
 	if err != nil {
@@ -401,7 +401,7 @@ func (h *handlerV1) CreateUser(c *gin.Context) {
 		return
 	}
 
-	response, err := h.serviceManager.UserMockService().CreateUser(ctx, &pb.User{
+	response, err := h.serviceManager.UserService().CreateUser(ctx, &pb.User{
 		Id:           body.Id,
 		FirstName:    body.FirstName,
 		LastName:     body.LastName,
@@ -452,7 +452,7 @@ func (h *handlerV1) GetUserById(c *gin.Context) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeOut))
 	defer cancel()
-	response, err := h.serviceManager.UserMockService().GetUserById(ctx, &pb.GetUserId{
+	response, err := h.serviceManager.UserService().GetUserById(ctx, &pb.GetUserId{
 		UserId: id,
 	})
 	if err != nil {
@@ -535,7 +535,7 @@ func (h *handlerV1) UpdateUser(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeOut))
 	defer cancel()
 
-	response, err := h.serviceManager.UserMockService().UpdateUser(ctx, &pb.User{
+	response, err := h.serviceManager.UserService().UpdateUser(ctx, &pb.User{
 		Id:        id,
 		FirstName: body.FirstName,
 		LastName:  body.LastName,
@@ -577,7 +577,7 @@ func (h *handlerV1) DeleteUser(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeOut))
 	defer cancel()
 
-	response, err := h.serviceManager.UserMockService().DeleteUser(ctx, &pb.GetUserId{
+	response, err := h.serviceManager.UserService().DeleteUser(ctx, &pb.GetUserId{
 		UserId: id,
 	})
 
@@ -635,7 +635,7 @@ func (h *handlerV1) GetAllUsers(c *gin.Context) {
 		return
 	}
 
-	response, err := h.serviceManager.UserMockService().ListUsers(ctx, &pb.GetListRequest{
+	response, err := h.serviceManager.UserService().ListUsers(ctx, &pb.GetListRequest{
 		Page:  int32(pageToInt),
 		Limit: int32(LimitToInt),
 	})
@@ -706,7 +706,7 @@ func (h *handlerV1) UpdateRefreshToken(c *gin.Context) {
 		return
 	}
 
-	_, err = h.serviceManager.UserMockService().UpdateRefreshToken(ctx, &pb.UpdateRefreshTokenReq{
+	_, err = h.serviceManager.UserService().UpdateRefreshToken(ctx, &pb.UpdateRefreshTokenReq{
 		UserId:       cast.ToString(claims["sub"]),
 		RefreshToken: refresh,
 	})

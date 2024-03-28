@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-type UserServiceClient interface {
+type UserServiceClientI interface {
 	CreateUser(ctx context.Context, in *pbu.User, opts ...grpc.CallOption) (*pbu.User, error)
 	GetUserById(ctx context.Context, in *pbu.GetUserId, opts ...grpc.CallOption) (*pbu.User, error)
 	UpdateUser(ctx context.Context, in *pbu.User, opts ...grpc.CallOption) (*pbu.User, error)
@@ -20,18 +20,18 @@ type UserServiceClient interface {
 	UpdateRefreshToken(ctx context.Context, in *pbu.UpdateRefreshTokenReq, opts ...grpc.CallOption) (*pbu.Status, error)
 }
 
-type userServiceClient struct {
+type UserServiceClient struct {
 }
 
-func NewUserServiceClient() UserServiceClient {
-	return &userServiceClient{}
+func NewUserServiceClient() UserServiceClientI {
+	return &UserServiceClient{}
 }
 
-func (c *userServiceClient) CreateUser(ctx context.Context, in *pbu.User, opts ...grpc.CallOption) (*pbu.User, error) {
+func (c *UserServiceClient) CreateUser(ctx context.Context, in *pbu.User, opts ...grpc.CallOption) (*pbu.User, error) {
 	return in, nil
 }
 
-func (c *userServiceClient) GetUserById(ctx context.Context, in *pbu.GetUserId, opts ...grpc.CallOption) (*pbu.User, error) {
+func (c *UserServiceClient) GetUserById(ctx context.Context, in *pbu.GetUserId, opts ...grpc.CallOption) (*pbu.User, error) {
 	return &pbu.User{
 		Id:           "d4f3f3ce-15f8-48da-9938-e5d9e0bb2aaf",
 		FirstName:    "Test FirstName",
@@ -44,17 +44,17 @@ func (c *userServiceClient) GetUserById(ctx context.Context, in *pbu.GetUserId, 
 	}, nil
 }
 
-func (c *userServiceClient) UpdateUser(ctx context.Context, in *pbu.User, opts ...grpc.CallOption) (*pbu.User, error) {
+func (c *UserServiceClient) UpdateUser(ctx context.Context, in *pbu.User, opts ...grpc.CallOption) (*pbu.User, error) {
 	return in, nil
 }
 
-func (c *userServiceClient) DeleteUser(ctx context.Context, in *pbu.GetUserId, opts ...grpc.CallOption) (*pbu.Status, error) {
+func (c *UserServiceClient) DeleteUser(ctx context.Context, in *pbu.GetUserId, opts ...grpc.CallOption) (*pbu.Status, error) {
 	return &pbu.Status{
 		Success: true,
 	}, nil
 }
 
-func (c *userServiceClient) ListUsers(ctx context.Context, in *pbu.GetListRequest, opts ...grpc.CallOption) (*pbu.GetListResponse, error) {
+func (c *UserServiceClient) ListUsers(ctx context.Context, in *pbu.GetListRequest, opts ...grpc.CallOption) (*pbu.GetListResponse, error) {
 	return &pbu.GetListResponse{
 		Count: 3,
 		Users: []*pbu.User{
@@ -92,11 +92,11 @@ func (c *userServiceClient) ListUsers(ctx context.Context, in *pbu.GetListReques
 		}, nil
 }
 
-func (c *userServiceClient) CheckField(ctx context.Context, in *pbu.CheckFieldRequest, opts ...grpc.CallOption) (*pbu.CheckFieldResponse, error) {
+func (c *UserServiceClient) CheckField(ctx context.Context, in *pbu.CheckFieldRequest, opts ...grpc.CallOption) (*pbu.CheckFieldResponse, error) {
 	return &pbu.CheckFieldResponse{Status: true}, nil
 }
 
-func (c *userServiceClient) Check(ctx context.Context, in *pbu.IfExists, opts ...grpc.CallOption) (*pbu.User, error) {
+func (c *UserServiceClient) Check(ctx context.Context, in *pbu.IfExists, opts ...grpc.CallOption) (*pbu.User, error) {
 	return &pbu.User{
 		Id:           "d4f3f3ce-15f8-48da-9938-e5d9e0bb2aaf",
 		FirstName:    "Test FirstName",
@@ -109,6 +109,6 @@ func (c *userServiceClient) Check(ctx context.Context, in *pbu.IfExists, opts ..
 	}, nil
 }
 
-func (c *userServiceClient) UpdateRefreshToken(ctx context.Context, in *pbu.UpdateRefreshTokenReq, opts ...grpc.CallOption) (*pbu.Status, error) {
+func (c *UserServiceClient) UpdateRefreshToken(ctx context.Context, in *pbu.UpdateRefreshTokenReq, opts ...grpc.CallOption) (*pbu.Status, error) {
 	return &pbu.Status{Success: true}, nil
 }

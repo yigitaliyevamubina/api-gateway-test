@@ -1,0 +1,9 @@
+{
+    "id":           "d4f3f3ce-15f8-48da-9938-e5d9e0bb2aaf",
+    "first_name":    "Test FirstName",
+    "last_name":     "Test Lastname",
+    "age":          18,
+    "email":        "testemail@gmail.com",
+    "password":     "**kkw##knrtest",
+    "refresh_token": "refresh token test"
+}

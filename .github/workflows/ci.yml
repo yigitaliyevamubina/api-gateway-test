@@ -27,7 +27,7 @@ jobs:
           go mod download
           go get -u golang.org/x/lint/golint
       - name: Run API Tests
-        run: go test -v -coverprofile=coverage.out ./api-testing/tests
+        run: go test -v -coverprofile=coverage.out ./mock/tests
 
       - name: Upload Code Coverage
         uses: actions/upload-artifact@v2

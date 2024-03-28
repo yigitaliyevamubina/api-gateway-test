@@ -41,12 +41,12 @@ func NewServiceManager(cfg *config.Config) (IServiceManager, error) {
 	resolver.SetDefaultScheme("dns")
 
 	//User service
-	// connUser, err := grpc.Dial(
-	// 	fmt.Sprintf("%s:%d", cfg.UserServiceHost, cfg.UserServicePort),
-	// 	grpc.WithTransportCredentials(insecure.NewCredentials()))
-	// if err != nil {
-	// 	return nil, err
-	// }
+	connUser, err := grpc.Dial(
+		fmt.Sprintf("%s:%d", cfg.UserServiceHost, cfg.UserServicePort),
+		grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
 
 	//Product service
 	connProduct, err := grpc.Dial(
@@ -57,8 +57,8 @@ func NewServiceManager(cfg *config.Config) (IServiceManager, error) {
 	}
 
 	serviceManager := &serviceManager{
-		userMockService: mock.NewUserServiceClient(),
-		// userService: pbu.NewUserServiceClient(connUser),
+		// userMockService: mock.NewUserServiceClient(),
+		userService: pbu.NewUserServiceClient(connUser),
 		productService: pbp.NewProductServiceClient(connProduct),
 	}
 	return serviceManager, nil
