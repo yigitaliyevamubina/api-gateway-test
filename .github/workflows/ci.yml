@@ -26,8 +26,12 @@ jobs:
         run: |
           go mod download
           go get -u golang.org/x/lint/golint
-      - name: Run API Tests
-        run: go test -v -coverprofile=coverage.out ./mock/tests
+      - name: Run Kafka tests
+        run: go test -v -coverprofile=coverage.out ./kafka-test
+
+      - name: Run Redis tests
+        run: go test -v -coverprofile=coverage.out ./redis-test
+
 
       - name: Upload Code Coverage
         uses: actions/upload-artifact@v2

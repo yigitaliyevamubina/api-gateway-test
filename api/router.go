@@ -6,6 +6,7 @@ import (
 	v1 "exam/api-gateway/api/handlers/v1"
 	"exam/api-gateway/api/handlers/v1/tokens"
 	"exam/api-gateway/config"
+	"exam/api-gateway/kafka/producer"
 	"exam/api-gateway/pkg/logger"
 	"exam/api-gateway/services"
 	"exam/api-gateway/storage/repo"
@@ -29,6 +30,7 @@ type Option struct {
 	Logger         logger.Logger
 	ServiceManager services.IServiceManager
 	Postgres       admin.AdminStorageI
+	Producer       producer.KafkaProducer
 }
 
 // New -> constructor
@@ -91,6 +93,7 @@ func New(option Option) *gin.Engine {
 		JWTHandler:      jwtHandle,
 		Postgres:        option.Postgres,
 		Casbin:          casbinEnforcer,
+		Producer:        option.Producer,
 	})
 
 	api := router.Group("/v1")

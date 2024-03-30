@@ -3,6 +3,7 @@ package main
 import (
 	"exam/api-gateway/api"
 	"exam/api-gateway/config"
+	"exam/api-gateway/kafka/producer"
 	"exam/api-gateway/pkg/db"
 	"exam/api-gateway/pkg/etc"
 	"exam/api-gateway/pkg/logger"
@@ -16,7 +17,7 @@ import (
 
 func main() {
 	//login superadmin -> username = 'a' -> password = 'b'
-				
+
 	cfg := config.Load()
 	log := logger.New(cfg.LogLevel, "api_gateway")
 
@@ -25,7 +26,6 @@ func main() {
 		log.Error("gRPC dial error", logger.Error(err))
 	}
 	fmt.Println(etc.HashPassword("b"))
-
 
 	redisPool := rds.Pool{
 		MaxIdle:   80,
@@ -45,12 +45,18 @@ func main() {
 		panic(err)
 	}
 
+	writer, err := producer.NewKafkaProducer([]string{"kafka:9092"})
+	if err != nil {
+		log.Fatal("cannot create a kafka producer", logger.Error(err))
+	}
+
 	server := api.New(api.Option{
 		InMemory:       redis.NewRedisRepo(&redisPool),
 		Cfg:            cfg,
 		Logger:         log,
 		ServiceManager: serviceManager,
 		Postgres:       admin.NewAdminRepo(db),
+		Producer:       writer,
 	})
 
 	if err := server.Run(cfg.HTTPPort); err != nil {

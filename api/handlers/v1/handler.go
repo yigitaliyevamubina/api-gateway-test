@@ -3,6 +3,7 @@ package v1
 import (
 	t "exam/api-gateway/api/handlers/v1/tokens"
 	"exam/api-gateway/config"
+	"exam/api-gateway/kafka/producer"
 	"exam/api-gateway/pkg/logger"
 	"exam/api-gateway/services"
 	admin "exam/api-gateway/storage/postgresrepo"
@@ -31,6 +32,7 @@ type handlerV1 struct {
 	cfg             config.Config
 	jwtHandler      t.JWTHandler
 	postgres        admin.AdminStorageI
+	producer        producer.KafkaProducer
 	casbin          *casbin.Enforcer
 }
 
@@ -41,6 +43,7 @@ type HandlerV1Config struct {
 	Cfg             config.Config
 	JWTHandler      t.JWTHandler
 	Postgres        admin.AdminStorageI
+	Producer        producer.KafkaProducer
 	Casbin          *casbin.Enforcer
 }
 
@@ -53,6 +56,7 @@ func New(c *HandlerV1Config) *handlerV1 {
 		jwtHandler:      c.JWTHandler,
 		postgres:        c.Postgres,
 		casbin:          c.Casbin,
+		producer:        c.Producer,
 	}
 
 }

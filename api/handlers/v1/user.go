@@ -113,6 +113,17 @@ func (h *handlerV1) Register(c *gin.Context) {
 		return
 	}
 
+	//*kafka*\\
+	err = h.producer.ProduceMessages("kafka-user", userJson)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		h.log.Error("cannot produce messages via kafka", logger.Error(err))
+		return
+	}
+	//*kafka*\\
+
 	timeOut := time.Minute * 2
 
 	err = h.inMemoryStorage.SetWithTTL(respUser.Email, string(userJson), int(timeOut.Seconds()))
